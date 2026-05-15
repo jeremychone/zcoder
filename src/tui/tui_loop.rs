@@ -21,34 +21,34 @@ pub async fn run_ui_loop(
 
 		match app_event {
 			AppEvent::Term(term_event) => {
-				if let Event::Key(key) = term_event {
-					if key.kind == KeyEventKind::Press {
-						match key.code {
-							// -- Global Quit
-							KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-								let _ = app_tx.send(AppEvent::Action(AppActionEvent::Quit)).await;
-							}
-
-							// -- Action
-							KeyCode::Enter => {
-								let trimmed_input = state.input().trim().to_string();
-								if trimmed_input == "/q" {
-									let _ = app_tx.send(AppEvent::Action(AppActionEvent::Quit)).await;
-								} else if !trimmed_input.is_empty() && !state.is_waiting() {
-									let prompt = state.input().to_string();
-									let _ = app_tx.send(AppEvent::Action(AppActionEvent::RunPrompt(prompt))).await;
-								}
-							}
-
-							// -- Input
-							KeyCode::Backspace => {
-								state.pop_input();
-							}
-							KeyCode::Char(c) => {
-								state.push_input(c);
-							}
-							_ => {}
+				if let Event::Key(key) = term_event
+					&& key.kind == KeyEventKind::Press
+				{
+					match key.code {
+						// -- Global Quit
+						KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+							let _ = app_tx.send(AppEvent::Action(AppActionEvent::Quit)).await;
 						}
+
+						// -- Action
+						KeyCode::Enter => {
+							let trimmed_input = state.input().trim().to_string();
+							if trimmed_input == "/q" {
+								let _ = app_tx.send(AppEvent::Action(AppActionEvent::Quit)).await;
+							} else if !trimmed_input.is_empty() && !state.is_waiting() {
+								let prompt = state.input().to_string();
+								let _ = app_tx.send(AppEvent::Action(AppActionEvent::RunPrompt(prompt))).await;
+							}
+						}
+
+						// -- Input
+						KeyCode::Backspace => {
+							state.pop_input();
+						}
+						KeyCode::Char(c) => {
+							state.push_input(c);
+						}
+						_ => {}
 					}
 				}
 			}

@@ -21,10 +21,7 @@ pub struct ExecutorTx {
 
 impl ExecutorTx {
 	pub async fn send(&self, action: ExecActionEvent) -> Result<()> {
-		self.tx
-			.send(action)
-			.await
-			.map_err(|_| Error::custom("Executor channel closed"))
+		self.tx.send(action).await.map_err(|_| Error::custom("Executor channel closed"))
 	}
 }
 
@@ -79,7 +76,10 @@ impl Executor {
 
 		let result = match res {
 			Ok(res) => {
-				let ai_response = res.content.into_first_text().ok_or_else(|| Error::custom("Should have response"))?;
+				let ai_response = res
+					.content
+					.into_first_text()
+					.ok_or_else(|| Error::custom("Should have response"))?;
 
 				// -- Process AI Response
 				let (file_changes, other_content) = udiffx::extract_file_changes(&ai_response, true)?;

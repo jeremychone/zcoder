@@ -4,11 +4,10 @@ mod term_reader;
 mod tui_loop;
 mod view;
 
-pub use event::{AppActionEvent, AppEvent};
-pub use state::AppState;
-
 use crate::Result;
 use crate::exec::{ExecStatusEvent, ExecutorTx};
+pub use event::{AppActionEvent, AppEvent};
+pub use state::AppState;
 use tokio::sync::mpsc::{self, Receiver};
 
 pub async fn start_tui(
