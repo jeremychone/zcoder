@@ -7,13 +7,6 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub enum Error {
 	#[from(String, &String, &str)]
 	Custom(String),
-
-	// -- Externals
-	#[from]
-	ZcCore(zc_core::Error),
-
-	#[from]
-	ZcTui(zc_tui::Error),
 }
 
 // region:    --- Custom

@@ -17,7 +17,31 @@ unsafe_code = "forbid"
 name = "zc"
 path = "src/main.rs"
 
+[workspace]
+members = [
+    "crates/zc-core",
+    "crates/zc-common",
+    "crates/zc-tui",
+]
+resolver = "3"
+
 [dependencies]
+# -- Sub Crates
+zc-core = { workspace = true }
+zc-tui = { workspace = true }
+# -- Async
+tokio = { workspace = true }
+# -- CLI
+clap = { workspace = true }
+# -- AI
+# -- FS
+# -- Others
+derive_more = { workspace = true }
+
+[workspace.dependencies]
+zc-core = { path = "crates/zc-core" }
+zc-common = { path = "crates/zc-common" }
+zc-tui = { path = "crates/zc-tui" }
 # -- Async
 tokio = { version = "1", features = ["full"] }
 futures = "0.3.31"

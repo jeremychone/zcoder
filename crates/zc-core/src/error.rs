@@ -10,10 +10,16 @@ pub enum Error {
 
 	// -- Externals
 	#[from]
-	ZcCore(zc_core::Error),
+	Io(std::io::Error),
 
 	#[from]
-	ZcTui(zc_tui::Error),
+	Genai(genai::Error),
+
+	#[from]
+	Udiffx(udiffx::Error),
+
+	#[from]
+	SimpleFs(simple_fs::Error),
 }
 
 // region:    --- Custom

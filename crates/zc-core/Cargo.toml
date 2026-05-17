@@ -1,0 +1,17 @@
+[package]
+name = "zc-core"
+version = "0.0.2-WIP"
+edition = "2024"
+
+[dependencies]
+# -- Sub Crates
+zc-common = { workspace = true }
+# -- Async
+tokio = { workspace = true }
+# -- AI
+genai = { workspace = true }
+udiffx = { workspace = true }
+# -- FS
+simple-fs = { workspace = true }
+# -- Others
+derive_more = { workspace = true }

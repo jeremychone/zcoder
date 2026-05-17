@@ -10,10 +10,13 @@ pub enum Error {
 
 	// -- Externals
 	#[from]
+	Io(std::io::Error),
+
+	#[from]
 	ZcCore(zc_core::Error),
 
 	#[from]
-	ZcTui(zc_tui::Error),
+	ExecActionSend(tokio::sync::mpsc::error::SendError<zc_common::ExecActionEvent>),
 }
 
 // region:    --- Custom

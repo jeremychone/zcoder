@@ -1,0 +1,17 @@
+[package]
+name = "zc-tui"
+version = "0.0.2-WIP"
+edition = "2024"
+
+[dependencies]
+# -- Sub Crates
+zc-core = { workspace = true }
+zc-common = { workspace = true }
+# -- Async
+tokio = { workspace = true }
+futures = { workspace = true }
+# -- CLI
+ratatui = { workspace = true }
+crossterm = { workspace = true }
+# -- Others
+derive_more = { workspace = true }

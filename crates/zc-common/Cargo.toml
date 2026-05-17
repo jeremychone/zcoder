@@ -1,0 +1,9 @@
+[package]
+name = "zc-common"
+version = "0.0.2-WIP"
+edition = "2024"
+
+[dependencies]
+# -- Async
+# -- Others
+derive_more = { workspace = true }
