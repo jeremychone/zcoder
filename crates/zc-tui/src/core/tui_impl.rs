@@ -21,9 +21,9 @@ pub async fn start_tui(
 	let app_tx_for_status = app_tx.clone();
 	tokio::spawn(async move {
 		while let Ok(status) = status_rx.recv().await {
-			if app_tx_for_status.send(TuiEvent::Exec(status)).await.is_err() {
-				break;
-			}
+			// if app_tx_for_status.send(TuiEvent::Exec(status)).await.is_err() {
+			// 	break;
+			// }
 		}
 	});
 

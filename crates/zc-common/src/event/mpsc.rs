@@ -7,14 +7,14 @@ use crossfire::{AsyncRx, MAsyncTx, RecvError, SendError, TryRecvError, TrySendEr
 #[derive(Clone)]
 pub struct Tx<T>
 where
-	T: Send + 'static,
+	T: Sync + Send + 'static,
 {
 	inner: MAsyncTx<Array<T>>,
 }
 
 pub struct Rx<T>
 where
-	T: Send + 'static,
+	T: Sync + Send + 'static,
 {
 	inner: AsyncRx<Array<T>>,
 }
@@ -22,7 +22,7 @@ where
 /// creates a new bounded mpsc channel with the given capacity and returns the sender and receiver.
 pub fn new_mpsc_bounded<E>() -> (Tx<E>, Rx<E>)
 where
-	E: Send + 'static,
+	E: Sync + Send + 'static,
 {
 	let (ctx, crx) = crossfire::mpsc::bounded_async::<E>(10_000);
 	let tx = Tx { inner: ctx };
@@ -34,7 +34,7 @@ where
 
 impl<T> Tx<T>
 where
-	T: Send + 'static,
+	T: Sync + Send + 'static,
 {
 	pub async fn send(&self, msg: T) -> Result<()>
 	where
@@ -56,7 +56,7 @@ where
 
 impl<T> Rx<T>
 where
-	T: Send + 'static,
+	T: Sync + Send + 'static,
 {
 	pub async fn recv(&self) -> Result<T> {
 		self.inner.recv().await.map_err(|e| Error::CrossfireRecv(e.to_string()))
