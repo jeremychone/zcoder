@@ -1,7 +1,7 @@
 // region:    --- Modules
 
-mod event_common;
+mod mpsc;
 
-pub use event_common::*;
+pub use mpsc::*;
 
 // endregion: --- Modules
