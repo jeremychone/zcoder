@@ -1,25 +1,24 @@
-use super::{AppActionEvent, TuiEvent, TuiState};
 use crate::Result;
+use crate::core::TuiState;
+use crate::event::{AppActionEvent, TuiEvent, TuiTx};
 use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
-use tokio::sync::mpsc::Sender;
-use zc_common::{ExecActionEvent, ExecStatusEvent};
-use zc_core::ExecutorTx;
+use zc_core::event::{ExecActionEvent, ExecStatusEvent, ExecutorTx};
 
-pub async fn handle_term_event(state: &mut TuiState, app_tx: &Sender<TuiEvent>, term_event: Event) {
+pub async fn handle_term_event(state: &mut TuiState, tui_tx: &TuiTx, term_event: Event) {
 	if let Event::Key(key) = term_event
 		&& key.kind == KeyEventKind::Press
 	{
 		match key.code {
 			KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-				let _ = app_tx.send(TuiEvent::Action(AppActionEvent::Quit)).await;
+				let _ = tui_tx.send(TuiEvent::Action(AppActionEvent::Quit)).await;
 			}
 			KeyCode::Enter => {
 				let trimmed_input = state.input().trim().to_string();
 				if trimmed_input == "/q" {
-					let _ = app_tx.send(TuiEvent::Action(AppActionEvent::Quit)).await;
+					let _ = tui_tx.send(TuiEvent::Action(AppActionEvent::Quit)).await;
 				} else if !trimmed_input.is_empty() && !state.is_waiting() {
 					let prompt = state.input().to_string();
-					let _ = app_tx.send(TuiEvent::Action(AppActionEvent::RunPrompt(prompt))).await;
+					let _ = tui_tx.send(TuiEvent::Action(AppActionEvent::RunPrompt(prompt))).await;
 				}
 			}
 			KeyCode::Backspace => {

@@ -8,15 +8,16 @@ pub enum Error {
 	#[from(String, &String, &str)]
 	Custom(String),
 
+	// -- Sub Crates
+	#[from]
+	ZcCommon(zc_common::Error),
+
 	// -- Externals
 	#[from]
 	Io(std::io::Error),
 
 	#[from]
 	ZcCore(zc_core::Error),
-
-	#[from]
-	ExecActionSend(tokio::sync::mpsc::error::SendError<zc_common::ExecActionEvent>),
 }
 
 // region:    --- Custom

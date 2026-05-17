@@ -1,3 +1,4 @@
+#![allow(unused)]
 use super::TuiState;
 
 pub struct StateProcessor;

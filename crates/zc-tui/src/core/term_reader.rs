@@ -1,10 +1,10 @@
-use super::TuiEvent;
+use crate::event::TuiEvent;
 use crossterm::event::EventStream;
 use futures::{FutureExt, StreamExt};
 use std::time::Duration;
-use tokio::sync::mpsc::Sender;
+use zc_common::event::Tx;
 
-pub fn run_term_reader(app_tx: Sender<TuiEvent>) {
+pub fn run_term_reader(tui_tx: Tx<TuiEvent>) {
 	tokio::spawn(async move {
 		let mut reader = EventStream::new();
 
@@ -20,7 +20,7 @@ pub fn run_term_reader(app_tx: Sender<TuiEvent>) {
 				maybe_event = &mut event => {
 					match maybe_event {
 						Some(Ok(evt)) => {
-							if app_tx.send(TuiEvent::Term(evt)).await.is_err() {
+							if tui_tx.send(TuiEvent::Term(evt)).await.is_err() {
 								break;
 							}
 						}

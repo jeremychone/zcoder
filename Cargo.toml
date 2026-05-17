@@ -42,9 +42,10 @@ derive_more = { workspace = true }
 zc-core = { path = "crates/zc-core" }
 zc-common = { path = "crates/zc-common" }
 zc-tui = { path = "crates/zc-tui" }
-# -- Async
+# -- Async & Events
 tokio = { version = "1", features = ["full"] }
 futures = "0.3.31"
+crossfire = "3.1.12"
 # -- CLI
 clap = { version = "4", features = ["derive"] }
 ratatui = "0.30"

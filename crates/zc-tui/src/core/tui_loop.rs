@@ -1,15 +1,14 @@
 use super::app_event_handlers::{handle_app_action, handle_exec_status, handle_term_event};
-use super::{TuiEvent, TuiState};
-use crate::view;
-use crate::{Error, Result};
+use crate::core::TuiState;
+use crate::event::{TuiEvent, TuiRx, TuiTx};
+use crate::{Result, view};
 use ratatui::DefaultTerminal;
-use tokio::sync::mpsc::{Receiver, Sender};
-use zc_core::ExecutorTx;
+use zc_core::event::ExecutorTx;
 
 pub async fn run_ui_loop(
 	mut terminal: DefaultTerminal,
-	mut app_rx: Receiver<TuiEvent>,
-	app_tx: Sender<TuiEvent>,
+	mut tui_rx: TuiRx,
+	tui_tx: TuiTx,
 	executor_tx: ExecutorTx,
 	initial_prompt: Option<String>,
 ) -> Result<()> {
@@ -18,11 +17,11 @@ pub async fn run_ui_loop(
 	loop {
 		terminal.draw(|f| view::render(f, &state))?;
 
-		let app_event = app_rx.recv().await.ok_or_else(|| Error::custom("App event channel closed"))?;
+		let app_event = tui_rx.recv().await?;
 
 		match app_event {
 			TuiEvent::Term(term_event) => {
-				handle_term_event(&mut state, &app_tx, term_event).await;
+				handle_term_event(&mut state, &tui_tx, term_event).await;
 			}
 
 			TuiEvent::Action(action) => {

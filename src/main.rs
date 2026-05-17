@@ -19,9 +19,7 @@ async fn main() -> Result<()> {
 	let executor_config = ExecutorConfig::default().with_base_dir(base_dir);
 	let (executor, executor_tx, status_rx) = Executor::new(executor_config);
 
-	tokio::spawn(async move {
-		executor.start().await;
-	});
+	tokio::spawn(async move { executor.start().await });
 
 	// -- Running Tui application
 	zc_tui::start_tui(executor_tx, status_rx, cli_cmd.prompt).await?;

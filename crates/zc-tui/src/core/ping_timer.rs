@@ -1,11 +1,10 @@
-use super::TuiEvent;
+use crate::event::{PingTimerTx, TuiEvent, TuiTx};
 use std::time::Duration;
-use tokio::sync::mpsc::{self, Sender};
+use zc_common::event::new_mpsc_bounded;
 
-pub type PingTimerTx = Sender<()>;
-
-pub fn start_ping_timer(app_tx: Sender<TuiEvent>, tick_interval: Duration) -> PingTimerTx {
-	let (stop_tx, mut stop_rx) = mpsc::channel(1);
+#[allow(unused)]
+pub fn start_ping_timer(tui_tx: TuiTx, tick_interval: Duration) -> PingTimerTx {
+	let (stop_tx, mut stop_rx) = new_mpsc_bounded::<()>();
 
 	tokio::spawn(async move {
 		let mut interval = tokio::time::interval(tick_interval);
@@ -13,7 +12,7 @@ pub fn start_ping_timer(app_tx: Sender<TuiEvent>, tick_interval: Duration) -> Pi
 		loop {
 			tokio::select! {
 				_ = interval.tick() => {
-					if app_tx.send(TuiEvent::Tick).await.is_err() {
+					if tui_tx.send(TuiEvent::Tick).await.is_err() {
 						break;
 					}
 				}
