@@ -6,7 +6,7 @@ pub enum ExecActionEvent {
 }
 
 pub type ExecutorActionRx = zc_common::event::Rx<ExecActionEvent>;
-pub type ExecutorStatusTx = zc_common::event::Tx<ExecStatusEvent>;
+pub type ExecutorTx = zc_common::event::Tx<ExecActionEvent>;
 
 // endregion: --- ExecutorAction
 
@@ -21,7 +21,7 @@ pub enum ExecStatusEvent {
 	RunError(String),
 }
 
-pub type ExecutorTx = zc_common::event::Tx<ExecActionEvent>;
 pub type ExecutorStatusRx = zc_common::event::Rx<ExecStatusEvent>;
+pub type ExecutorStatusTx = zc_common::event::Tx<ExecStatusEvent>;
 
 // endregion: --- ExecStatus

@@ -9,8 +9,8 @@ pub enum Error {
 	Custom(String),
 
 	// -- External
-	CrossfireSend(String),
-	CrossfireRecv(String),
+	Tx(String),
+	Rx(String),
 }
 
 // region:    --- Custom

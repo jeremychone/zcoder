@@ -1,8 +1,6 @@
-#![allow(unused)]
-
 use crate::{Error, Result};
 use crossfire::mpsc::Array;
-use crossfire::{AsyncRx, MAsyncTx, RecvError, SendError, TryRecvError, TrySendError};
+use crossfire::{AsyncRx, MAsyncTx, TryRecvError};
 
 // NOTE:
 #[derive(Clone)]
@@ -41,17 +39,12 @@ where
 	where
 		T: Unpin,
 	{
-		self.inner.send(msg).await.map_err(|e| Error::CrossfireSend(e.to_string()))
+		self.inner.send(msg).await.map_err(|e| Error::Tx(e.to_string()))
 	}
 
 	pub fn send_sync(&self, msg: T) -> Result<()> {
 		let tx = self.inner.clone().into_blocking();
-		tx.send(msg).map_err(|e| Error::CrossfireSend(e.to_string()))
-	}
-
-	pub fn try_send(&self, msg: T) -> Result<()> {
-		let res = self.inner.try_send(msg);
-		res.map_err(|e| Error::CrossfireSend(e.to_string()))
+		tx.send(msg).map_err(|e| Error::Tx(e.to_string()))
 	}
 }
 
@@ -60,7 +53,7 @@ where
 	T: Send + 'static,
 {
 	pub async fn recv(&mut self) -> Result<T> {
-		self.inner.recv().await.map_err(|e| Error::CrossfireRecv(e.to_string()))
+		self.inner.recv().await.map_err(|e| Error::Rx(e.to_string()))
 	}
 
 	pub fn try_recv(&self) -> Result<Option<T>> {
@@ -68,7 +61,7 @@ where
 			Ok(res) => Ok(Some(res)),
 			Err(err) => match err {
 				TryRecvError::Empty => Ok(None),
-				TryRecvError::Disconnected => Err(Error::CrossfireRecv("disconnected".to_string())),
+				TryRecvError::Disconnected => Err(Error::Rx("disconnected".to_string())),
 			},
 		}
 	}
