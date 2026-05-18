@@ -6,5 +6,8 @@ edition = "2024"
 [dependencies]
 # -- Async & Events
 crossfire = { workspace = true }
+# -- Time
+time = { workspace = true }
+time-tz = { workspace = true }
 # -- Others
 derive_more = { workspace = true }

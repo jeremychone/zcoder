@@ -1,8 +1,11 @@
 // region:    --- Modules
 
+mod derive_aliases;
 mod error;
 mod executor;
+mod model;
 
+use derive_aliases::*;
 pub use error::{Error, Result};
 pub use event::{ExecActionEvent, ExecStatusEvent};
 pub use executor::{Executor, ExecutorConfig};

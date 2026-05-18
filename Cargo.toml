@@ -33,8 +33,6 @@ zc-tui = { workspace = true }
 tokio = { workspace = true }
 # -- CLI
 clap = { workspace = true }
-# -- AI
-# -- FS
 # -- Others
 derive_more = { workspace = true }
 
@@ -53,8 +51,17 @@ crossterm = { version = "0.29", features = ["event-stream"] }
 # -- AI
 genai = { version = "=0.6.0-beta.20" }
 udiffx = { version = "0.1", features = ["prompt"]}
+# -- DB
+rusqlite = { version = "0.39.0", features = ["bundled", "uuid", "serde_json", "serialize"] }
+modql = { version = "0.5.0-alpha.8", features = ["with-rusqlite"]}
 # -- FS
 simple-fs = { version = "0.12"}
+# -- Time
+time = { version = "0.3.44", features = ["formatting", "local-offset"]}
+time-tz = {version = "2.0.0", features = ["system"]}
 # -- Others
-derive_more = { version = "2", features = ["from", "display"] }
+macro_rules_attribute = "0.2.2"
+uuid = {version = "1.18", features = ["v4", "v7", "fast-rng"]}
+derive_more = { version = "2", features = ["from","display","debug", "into", "deref"] }
+
 
