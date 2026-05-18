@@ -88,29 +88,57 @@ impl Executor {
 	}
 
 	pub async fn start(self) {
-		while let Ok(action) = self.action_rx.recv().await {
+		let Self {
+			mut action_rx,
+			status_tx,
+			genai_client,
+			base_chat_req,
+			base_dir,
+			model,
+			src_globs,
+		} = self;
+
+		while let Ok(action) = action_rx.recv().await {
 			match action {
 				ExecActionEvent::RunPrompt(prompt) => {
-					let _ = self.handle_run_prompt(prompt).await;
+					let _ = Self::handle_run_prompt(
+						&status_tx,
+						&genai_client,
+						&base_chat_req,
+						&base_dir,
+						model,
+						src_globs,
+						prompt,
+					)
+					.await;
 				}
 			}
 		}
 	}
 
-	async fn handle_run_prompt(&self, prompt: String) -> Result<()> {
-		let _ = self.status_tx.send(ExecStatusEvent::RunStart).await;
+	async fn handle_run_prompt(
+		status_tx: &ExecutorStatusTx,
+		genai_client: &genai::Client,
+		base_chat_req: &ChatRequest,
+		base_dir: &str,
+		model: &'static str,
+		src_globs: &'static [&'static str],
+		prompt: String,
+	) -> Result<()> {
+		let _ = status_tx.send(ExecStatusEvent::RunStart).await;
 
-		let mut chat_req = self.base_chat_req.clone();
+		let mut chat_req = base_chat_req.clone();
 		chat_req = chat_req.append_message(ChatMessage::user(prompt));
 
 		// -- Load files Context
-		let files_context = udiffx::load_files_context(&self.base_dir, self.src_globs)?;
+		let files_context = udiffx::load_files_context(base_dir, src_globs)?;
+
 		if let Some(files_context) = files_context {
 			chat_req = chat_req.append_message(ChatMessage::user(files_context));
 		}
 
 		// -- Execute Chat
-		let res = self.genai_client.exec_chat(self.model, chat_req, None).await;
+		let res = genai_client.exec_chat(model, chat_req, None).await;
 
 		let result = match res {
 			Ok(res) => {
@@ -119,25 +147,27 @@ impl Executor {
 					.into_first_text()
 					.ok_or_else(|| Error::custom("Should have response"))?;
 
-				// -- Process AI Response
 				let (file_changes, other_content) = udiffx::extract_file_changes(&ai_response, true)?;
-				let _change_statuses = udiffx::apply_file_changes(&self.base_dir, file_changes)?;
+
+				let _change_statuses = udiffx::apply_file_changes(base_dir, file_changes)?;
 
 				Ok(other_content.unwrap_or_default())
 			}
+
 			Err(err) => Err(Error::from(err)),
 		};
 
 		match result {
 			Ok(answer) => {
-				let _ = self.status_tx.send(ExecStatusEvent::RunResult(answer)).await;
+				let _ = status_tx.send(ExecStatusEvent::RunResult(answer)).await;
 			}
+
 			Err(err) => {
-				let _ = self.status_tx.send(ExecStatusEvent::RunError(err.to_string())).await;
+				let _ = status_tx.send(ExecStatusEvent::RunError(err.to_string())).await;
 			}
 		}
 
-		let _ = self.status_tx.send(ExecStatusEvent::RunEnd).await;
+		let _ = status_tx.send(ExecStatusEvent::RunEnd).await;
 
 		Ok(())
 	}

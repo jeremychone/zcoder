@@ -59,7 +59,7 @@ impl<T> Rx<T>
 where
 	T: Send + 'static + Unpin,
 {
-	pub async fn recv(&self) -> Result<T> {
+	pub async fn recv(&mut self) -> Result<T> {
 		self.inner.recv().await.map_err(|e| Error::CrossfireRecv(e.to_string()))
 	}
 

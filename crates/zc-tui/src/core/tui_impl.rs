@@ -7,7 +7,7 @@ pub type AppTx = Sender<TuiEvent>;
 
 pub async fn start_tui(
 	executor_tx: ExecutorTx,
-	status_rx: ExecutorStatusRx,
+	mut status_rx: ExecutorStatusRx,
 	initial_prompt: Option<String>,
 ) -> Result<()> {
 	// -- Init Terminal
@@ -21,9 +21,9 @@ pub async fn start_tui(
 	let app_tx_for_status = app_tx.clone();
 	tokio::spawn(async move {
 		while let Ok(status) = status_rx.recv().await {
-			// if app_tx_for_status.send(TuiEvent::Exec(status)).await.is_err() {
-			// 	break;
-			// }
+			if app_tx_for_status.send(TuiEvent::Exec(status)).await.is_err() {
+				break;
+			}
 		}
 	});
 
