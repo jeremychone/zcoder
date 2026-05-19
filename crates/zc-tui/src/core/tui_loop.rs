@@ -3,13 +3,13 @@ use crate::core::TuiState;
 use crate::event::{TuiEvent, TuiRx, TuiTx};
 use crate::{Result, view};
 use ratatui::DefaultTerminal;
-use zc_core::event::ExecutorTx;
+use zc_core::event::ExecActionTx;
 
 pub async fn run_ui_loop(
 	mut terminal: DefaultTerminal,
 	mut tui_rx: TuiRx,
 	tui_tx: TuiTx,
-	executor_tx: ExecutorTx,
+	executor_tx: ExecActionTx,
 	initial_prompt: Option<String>,
 ) -> Result<()> {
 	let mut state = TuiState::new(initial_prompt);

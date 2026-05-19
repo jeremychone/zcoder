@@ -1,6 +1,6 @@
 use crossterm::event::Event;
 use zc_common::event::{Rx, Tx};
-use zc_core::ExecStatusEvent;
+use zc_core::ExecEvent;
 
 // region:    --- Tui Event
 
@@ -11,7 +11,7 @@ pub type TuiRx = Rx<TuiEvent>;
 pub enum TuiEvent {
 	Term(Event),
 	Action(AppActionEvent),
-	Exec(ExecStatusEvent),
+	Exec(ExecEvent),
 	Tick,
 	DoRedraw,
 }

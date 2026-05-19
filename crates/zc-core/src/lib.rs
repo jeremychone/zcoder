@@ -7,7 +7,7 @@ mod model;
 
 use derive_aliases::*;
 pub use error::{Error, Result};
-pub use event::{ExecActionEvent, ExecStatusEvent};
+pub use event::{ExecAction, ExecEvent};
 pub use executor::{Executor, ExecutorConfig};
 
 pub mod event;

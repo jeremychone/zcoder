@@ -2,10 +2,10 @@ use super::{term_reader, tui_loop};
 use crate::Result;
 use crate::event::TuiEvent;
 use zc_common::event::new_mpsc_bounded;
-use zc_core::event::{ExecutorStatusRx, ExecutorTx};
+use zc_core::event::{ExecActionTx, ExecutorStatusRx};
 
 pub async fn start_tui(
-	executor_tx: ExecutorTx,
+	executor_tx: ExecActionTx,
 	mut status_rx: ExecutorStatusRx,
 	initial_prompt: Option<String>,
 ) -> Result<()> {

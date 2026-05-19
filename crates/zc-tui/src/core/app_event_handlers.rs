@@ -2,7 +2,7 @@ use crate::Result;
 use crate::core::TuiState;
 use crate::event::{AppActionEvent, TuiEvent, TuiTx};
 use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
-use zc_core::event::{ExecActionEvent, ExecStatusEvent, ExecutorTx};
+use zc_core::event::{ExecAction, ExecActionTx, ExecEvent};
 
 pub async fn handle_term_event(state: &mut TuiState, tui_tx: &TuiTx, term_event: Event) {
 	if let Event::Key(key) = term_event
@@ -32,32 +32,36 @@ pub async fn handle_term_event(state: &mut TuiState, tui_tx: &TuiTx, term_event:
 	}
 }
 
-pub async fn handle_app_action(state: &mut TuiState, executor_tx: &ExecutorTx, action: AppActionEvent) -> Result<bool> {
+pub async fn handle_app_action(
+	state: &mut TuiState,
+	executor_tx: &ExecActionTx,
+	action: AppActionEvent,
+) -> Result<bool> {
 	match action {
 		AppActionEvent::Quit => Ok(true),
 		AppActionEvent::RunPrompt(prompt) => {
 			state.clear_input();
 			state.set_waiting(true);
 			state.set_last_error(None);
-			executor_tx.send(ExecActionEvent::RunPrompt(prompt)).await?;
+			executor_tx.send(ExecAction::RunPrompt(prompt)).await?;
 			Ok(false)
 		}
 	}
 }
 
-pub fn handle_exec_status(state: &mut TuiState, status: ExecStatusEvent) {
+pub fn handle_exec_status(state: &mut TuiState, status: ExecEvent) {
 	match status {
-		ExecStatusEvent::RunStart => {
+		ExecEvent::RunStart => {
 			state.set_status("Sending to AI...".to_string());
 		}
-		ExecStatusEvent::RunEnd => {
+		ExecEvent::RunEnd => {
 			state.set_waiting(false);
 			state.set_status("Idle".to_string());
 		}
-		ExecStatusEvent::RunResult(answer) => {
+		ExecEvent::RunResult(answer) => {
 			state.set_last_answer(Some(answer));
 		}
-		ExecStatusEvent::RunError(err) => {
+		ExecEvent::RunError(err) => {
 			state.set_last_error(Some(err));
 		}
 	}

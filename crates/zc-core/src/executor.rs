@@ -1,5 +1,5 @@
-use crate::event::{ExecutorActionRx, ExecutorStatusRx, ExecutorStatusTx, ExecutorTx};
-use crate::{Error, ExecActionEvent, ExecStatusEvent, Result};
+use crate::event::{ExecActionRx, ExecActionTx, ExecutorStatusRx, ExecutorStatusTx};
+use crate::{Error, ExecAction, ExecEvent, Result};
 use genai::chat::{ChatMessage, ChatRequest};
 use zc_common::event::new_mpsc_bounded;
 
@@ -13,7 +13,7 @@ const DEFAULT_SRC_GLOBS: &[&str] = &[
 ];
 
 pub struct Executor {
-	action_rx: ExecutorActionRx,
+	action_rx: ExecActionRx,
 	inner: ExecutorInner,
 }
 
@@ -62,9 +62,9 @@ impl ExecutorConfig {
 }
 
 impl Executor {
-	pub fn new(config: ExecutorConfig) -> (Self, ExecutorTx, ExecutorStatusRx) {
-		let (action_tx, action_rx) = new_mpsc_bounded::<ExecActionEvent>();
-		let (status_tx, status_rx) = new_mpsc_bounded::<ExecStatusEvent>();
+	pub fn new(config: ExecutorConfig) -> (Self, ExecActionTx, ExecutorStatusRx) {
+		let (action_tx, action_rx) = new_mpsc_bounded::<ExecAction>();
+		let (status_tx, status_rx) = new_mpsc_bounded::<ExecEvent>();
 
 		let base_chat_req = ChatRequest::from_system(format!(
 			"You are a senior developer. User will give you instructions and context.\n\n{}",
@@ -93,7 +93,7 @@ impl Executor {
 
 		while let Ok(action) = action_rx.recv().await {
 			match action {
-				ExecActionEvent::RunPrompt(prompt) => {
+				ExecAction::RunPrompt(prompt) => {
 					let _ = inner.handle_run_prompt(prompt).await;
 				}
 			}
@@ -105,7 +105,7 @@ impl Executor {
 
 impl ExecutorInner {
 	async fn handle_run_prompt(&self, prompt: String) -> Result<()> {
-		let _ = self.status_tx.send(ExecStatusEvent::RunStart).await;
+		let _ = self.status_tx.send(ExecEvent::RunStart).await;
 
 		let mut chat_req = self.base_chat_req.clone();
 		chat_req = chat_req.append_message(ChatMessage::user(prompt));
@@ -137,14 +137,14 @@ impl ExecutorInner {
 
 		match result {
 			Ok(answer) => {
-				let _ = self.status_tx.send(ExecStatusEvent::RunResult(answer)).await;
+				let _ = self.status_tx.send(ExecEvent::RunResult(answer)).await;
 			}
 			Err(err) => {
-				let _ = self.status_tx.send(ExecStatusEvent::RunError(err.to_string())).await;
+				let _ = self.status_tx.send(ExecEvent::RunError(err.to_string())).await;
 			}
 		}
 
-		let _ = self.status_tx.send(ExecStatusEvent::RunEnd).await;
+		let _ = self.status_tx.send(ExecEvent::RunEnd).await;
 
 		Ok(())
 	}
