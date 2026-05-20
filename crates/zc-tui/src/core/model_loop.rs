@@ -1,4 +1,4 @@
-use crate::event::{TuiEvent, TuiTx};
+use crate::core::event::{TuiEvent, TuiTx};
 use zc_core::model::get_model_bus;
 
 // region:    --- Model Loop

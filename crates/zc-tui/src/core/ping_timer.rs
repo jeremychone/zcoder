@@ -1,4 +1,4 @@
-use crate::event::{PingTimerTx, TuiEvent, TuiTx};
+use super::event::{PingTimerTx, TuiEvent, TuiTx};
 use std::time::Duration;
 use zc_common::event::new_mpsc_bounded;
 

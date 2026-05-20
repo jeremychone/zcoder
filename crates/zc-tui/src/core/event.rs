@@ -15,17 +15,8 @@ pub enum TuiEvent {
 	Exec(ExecEvent),
 	Model(ModelEvent),
 	Tick,
+	#[allow(unused)]
 	DoRedraw,
-}
-
-impl TuiEvent {
-	/// Returns `true` if the tui event is [`Model`].
-	///
-	/// [`Model`]: TuiEvent::Model
-	#[must_use]
-	pub fn is_model(&self) -> bool {
-		matches!(self, Self::Model(..))
-	}
 }
 
 #[derive(Debug, Clone)]

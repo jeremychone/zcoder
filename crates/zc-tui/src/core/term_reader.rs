@@ -1,4 +1,4 @@
-use crate::event::TuiEvent;
+use super::event::TuiEvent;
 use crossterm::event::EventStream;
 use futures::{FutureExt, StreamExt};
 use std::time::Duration;
