@@ -2,7 +2,7 @@ use crate::Result;
 use crate::core::TuiState;
 use crate::event::{AppActionEvent, TuiEvent, TuiTx};
 use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
-use zc_core::exec::{ExecAction, ExecActionTx, ExecEvent};
+use zc_core::exec::{ExecCmd, ExecCmdTx, ExecEvent};
 
 pub async fn handle_term_event(state: &mut TuiState, tui_tx: &TuiTx, term_event: Event) {
 	if let Event::Key(key) = term_event
@@ -32,18 +32,14 @@ pub async fn handle_term_event(state: &mut TuiState, tui_tx: &TuiTx, term_event:
 	}
 }
 
-pub async fn handle_app_action(
-	state: &mut TuiState,
-	executor_tx: &ExecActionTx,
-	action: AppActionEvent,
-) -> Result<bool> {
+pub async fn handle_app_action(state: &mut TuiState, executor_tx: &ExecCmdTx, action: AppActionEvent) -> Result<bool> {
 	match action {
 		AppActionEvent::Quit => Ok(true),
 		AppActionEvent::RunPrompt(prompt) => {
 			state.clear_input();
 			state.set_waiting(true);
 			state.set_last_error(None);
-			executor_tx.send(ExecAction::RunPrompt(prompt)).await?;
+			executor_tx.send(ExecCmd::RunPrompt(prompt)).await?;
 			Ok(false)
 		}
 	}

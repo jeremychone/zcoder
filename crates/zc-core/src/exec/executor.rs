@@ -1,6 +1,4 @@
-use crate::exec::{
-	Error, ExecAction, ExecActionRx, ExecActionTx, ExecEvent, ExecutorStatusRx, ExecutorStatusTx, Result,
-};
+use crate::exec::{Error, ExecCmd, ExecCmdRx, ExecCmdTx, ExecEvent, ExecEventRx, ExecEventTx, Result};
 use genai::chat::{ChatMessage, ChatRequest};
 use zc_common::event::new_mpsc_bounded;
 
@@ -14,12 +12,12 @@ const DEFAULT_SRC_GLOBS: &[&str] = &[
 ];
 
 pub struct Executor {
-	action_rx: ExecActionRx,
+	action_rx: ExecCmdRx,
 	inner: ExecutorInner,
 }
 
 struct ExecutorInner {
-	status_tx: ExecutorStatusTx,
+	status_tx: ExecEventTx,
 	// State needed for execution
 	genai_client: genai::Client,
 	base_chat_req: ChatRequest,
@@ -63,8 +61,8 @@ impl ExecutorConfig {
 }
 
 impl Executor {
-	pub fn new(config: ExecutorConfig) -> (Self, ExecActionTx, ExecutorStatusRx) {
-		let (action_tx, action_rx) = new_mpsc_bounded::<ExecAction>();
+	pub fn new(config: ExecutorConfig) -> (Self, ExecCmdTx, ExecEventRx) {
+		let (action_tx, action_rx) = new_mpsc_bounded::<ExecCmd>();
 		let (status_tx, status_rx) = new_mpsc_bounded::<ExecEvent>();
 
 		let base_chat_req = ChatRequest::from_system(format!(
@@ -94,7 +92,7 @@ impl Executor {
 
 		while let Ok(action) = action_rx.recv().await {
 			match action {
-				ExecAction::RunPrompt(prompt) => {
+				ExecCmd::RunPrompt(prompt) => {
 					let _ = inner.handle_run_prompt(prompt).await;
 				}
 			}

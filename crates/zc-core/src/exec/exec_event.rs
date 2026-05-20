@@ -1,12 +1,12 @@
 // region:    --- ExecutorAction
 
 #[derive(Debug)]
-pub enum ExecAction {
+pub enum ExecCmd {
 	RunPrompt(String),
 }
 
-pub type ExecActionRx = zc_common::event::Rx<ExecAction>;
-pub type ExecActionTx = zc_common::event::Tx<ExecAction>;
+pub type ExecCmdRx = zc_common::event::Rx<ExecCmd>;
+pub type ExecCmdTx = zc_common::event::Tx<ExecCmd>;
 
 // endregion: --- ExecutorAction
 
@@ -21,7 +21,7 @@ pub enum ExecEvent {
 	RunError(String),
 }
 
-pub type ExecutorStatusRx = zc_common::event::Rx<ExecEvent>;
-pub type ExecutorStatusTx = zc_common::event::Tx<ExecEvent>;
+pub type ExecEventRx = zc_common::event::Rx<ExecEvent>;
+pub type ExecEventTx = zc_common::event::Tx<ExecEvent>;
 
 // endregion: --- ExecStatus

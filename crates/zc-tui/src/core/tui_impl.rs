@@ -2,11 +2,11 @@ use super::{term_reader, tui_loop};
 use crate::Result;
 use crate::event::TuiEvent;
 use zc_common::event::new_mpsc_bounded;
-use zc_core::exec::{ExecActionTx, ExecutorStatusRx};
+use zc_core::exec::{ExecCmdTx, ExecEventRx};
 
 pub async fn start_tui(
-	executor_tx: ExecActionTx,
-	mut status_rx: ExecutorStatusRx,
+	executor_tx: ExecCmdTx,
+	mut status_rx: ExecEventRx,
 	initial_prompt: Option<String>,
 ) -> Result<()> {
 	// -- Init Terminal
