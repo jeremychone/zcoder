@@ -2,19 +2,17 @@ use crate::model::Result;
 use crate::model::db::Db;
 use std::sync::OnceLock;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ModelManager {
 	db: Db,
 }
 
-/// Public getter
-/// NOTE: (for now, one and only one for the whole system. Static)
-impl ModelManager {
-	/// NOTE: Should have own Error (avoid string, but needs to be clone)
-	pub fn get() -> std::result::Result<&'static ModelManager, String> {
-		let res = INSTANCE.get_or_init(ModelManager::new);
-		res.as_ref().map_err(|err| err.to_string())
-	}
+/// Internal Constructors
+static INSTANCE: OnceLock<Result<ModelManager>> = OnceLock::new();
+
+pub fn get_model_manager() -> std::result::Result<&'static ModelManager, String> {
+	let res = INSTANCE.get_or_init(ModelManager::new);
+	res.as_ref().map_err(|err| err.to_string())
 }
 
 /// Management
@@ -40,9 +38,6 @@ FROM pragma_page_count(), pragma_page_size();
 		Ok(res)
 	}
 }
-
-/// Internal Constructors
-static INSTANCE: OnceLock<Result<ModelManager>> = OnceLock::new();
 
 impl ModelManager {
 	fn new() -> Result<Self> {

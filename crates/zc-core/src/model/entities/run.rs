@@ -78,11 +78,12 @@ impl RunBmc {
 #[cfg(test)]
 mod tests {
 	use super::*;
+	use crate::model::model_manager::get_model_manager;
 	type Result<T> = core::result::Result<T, Box<dyn std::error::Error>>; // For tests.
 
 	fn test_model_run_bmc_create() -> Result<()> {
 		// -- Fixture
-		let mm = ModelManager::get()?;
+		let mm = get_model_manager()?;
 		let run_c = RunForCreate {
 			prompt: Some("Why is shy red?".to_string()),
 			answer: Some("Because not happy.".to_string()),
