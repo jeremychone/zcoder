@@ -43,7 +43,7 @@ const ALL_MAIN_TABLES: &[(&str, &str)] = &[RUN_TABLE];
 
 fn create_schema(con: &Connection) -> Result<()> {
 	for tables in [ALL_MAIN_TABLES] {
-		for (name, table_sql) in tables {
+		for (_name, table_sql) in tables {
 			con.execute(table_sql, ())?;
 		}
 	}

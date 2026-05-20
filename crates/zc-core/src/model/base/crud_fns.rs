@@ -50,6 +50,7 @@ where
 	update_with_rel_ids::<MC>(mm, id, fields, RelIds::default())
 }
 
+#[allow(unused)]
 pub fn create_where_not_exists<MC>(
 	mm: &ModelManager,
 	mut fields: SqliteFields,
@@ -103,18 +104,12 @@ RETURNING id",
 	Ok(id)
 }
 
+#[allow(unused)]
 pub fn create_with_rel_ids<MC>(mm: &ModelManager, fields: SqliteFields, rel_ids: RelIds) -> Result<Id>
 where
 	MC: DbBmc,
 {
 	create_inner::<MC>(mm, fields, true, rel_ids)
-}
-
-pub fn create_uid_included_with_rel_ids<MC>(mm: &ModelManager, fields: SqliteFields, rel_ids: RelIds) -> Result<Id>
-where
-	MC: DbBmc,
-{
-	create_inner::<MC>(mm, fields, false, rel_ids)
 }
 
 fn create_inner<MC>(mm: &ModelManager, mut fields: SqliteFields, generate_uuid: bool, rel_ids: RelIds) -> Result<Id>
@@ -174,6 +169,7 @@ where
 	Ok(entity)
 }
 
+#[allow(unused)]
 pub fn batch_create_with_rel_ids<MC>(
 	mm: &ModelManager,
 	mut items: Vec<SqliteFields>,
@@ -215,6 +211,7 @@ where
 }
 
 /// Helper to convert a Vec<T> into Vec<SqliteFields> using sqlite_not_none_fields().
+#[allow(unused)]
 pub fn map_items_to_sqlite_fields<T>(items: Vec<T>) -> Vec<SqliteFields>
 where
 	T: HasSqliteFields,
@@ -293,24 +290,3 @@ where
 
 	Ok(entities)
 }
-
-// pub fn list<MC>(mm: &ModelManager) -> Result<Id>
-// where
-// 	MC: DbBmc,
-// {
-// 	// -- Build sql
-// 	let sql = format!(
-// 		"INSERT INTO {} ({}) VALUES ({}) RETURNING id",
-// 		MC::table_ref(),
-// 		fields.sql_columns(),
-// 		fields.sql_placeholders()
-// 	);
-
-// 	// -- Execute the command
-// 	let values = fields.values_as_dyn_to_sql_vec();
-// 	let db = mm.db();
-
-// 	let id = db.exec_returning_num(&sql, &*values)?;
-
-// 	Ok(123.into())
-// }

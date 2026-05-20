@@ -5,7 +5,7 @@ edition = "2024"
 
 [lints.rust]
 unsafe_code = "forbid"
-unused = { level = "allow", priority = -1 } # For exploratory dev.
+# unused = { level = "allow", priority = -1 } # For exploratory dev.
 # missing_docs = "warn"
 
 [dependencies]

@@ -175,7 +175,7 @@ impl ExecutorInner {
 					error: Some(err.to_string()),
 					..Default::default()
 				},
-			);
+			)?;
 
 			let _ = self.status_tx.send(ExecEvent::RunError(run_id)).await;
 

@@ -3,7 +3,6 @@ use crate::model::{EntityType, EpochUs, Id, ModelManager, Result};
 use modql::SqliteFromRow;
 use modql::field::{Fields, HasSqliteFields};
 use modql::filter::ListOptions;
-use uuid::Uuid;
 
 // region:    --- Types
 
@@ -17,11 +16,6 @@ pub struct Run {
 	pub prompt: Option<String>,
 	pub answer: Option<String>,
 	pub error: Option<String>,
-}
-
-#[derive(Debug, Clone, Fields, SqliteFromRow)]
-pub struct RunForIds {
-	pub id: Id,
 }
 
 #[derive(Debug, Clone, Fields, SqliteFromRow)]
@@ -81,6 +75,7 @@ mod tests {
 	use crate::model::model_manager::get_model_manager;
 	type Result<T> = core::result::Result<T, Box<dyn std::error::Error>>; // For tests.
 
+	#[test]
 	fn test_model_run_bmc_create() -> Result<()> {
 		// -- Fixture
 		let mm = get_model_manager()?;
