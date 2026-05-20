@@ -11,7 +11,7 @@ pub fn prep_fields_for_create<MC>(fields: &mut SqliteFields)
 where
 	MC: DbBmc,
 {
-	fields.push(SqliteField::new("uid", Uuid::now_v7()));
+	fields.push(SqliteField::new("id", Uuid::now_v7()));
 	prep_fields_for_create_uid_included(fields);
 }
 

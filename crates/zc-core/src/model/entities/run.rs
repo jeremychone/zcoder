@@ -10,7 +10,6 @@ use uuid::Uuid;
 #[derive(Debug, Clone, Fields, SqliteFromRow)]
 pub struct Run {
 	pub id: Id,
-	pub uid: Uuid,
 
 	pub ctime: EpochUs,
 	pub mtime: EpochUs,
@@ -23,7 +22,6 @@ pub struct Run {
 #[derive(Debug, Clone, Fields, SqliteFromRow)]
 pub struct RunForIds {
 	pub id: Id,
-	pub uid: Uuid,
 }
 
 #[derive(Debug, Clone, Fields, SqliteFromRow)]
@@ -95,7 +93,8 @@ mod tests {
 		let id = RunBmc::create(mm, run_c)?;
 
 		// -- Check
-		assert_eq!(id.as_i64(), 1);
+		let run = RunBmc::get(mm, id)?;
+		assert_eq!(run.prompt.as_deref(), Some("Why is shy red?"));
 
 		Ok(())
 	}

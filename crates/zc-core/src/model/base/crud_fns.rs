@@ -6,7 +6,6 @@ use crate::model::{EntityAction, Id, ModelEvent, ModelManager, RelIds, Result, g
 use modql::SqliteFromRow;
 use modql::field::{HasSqliteFields, SqliteFields};
 use modql::filter::ListOptions;
-use uuid::Uuid;
 
 pub const DEFAULT_LIST_LIMIT: i64 = 12000;
 
@@ -90,9 +89,7 @@ RETURNING id",
 	let values = fields.values_as_dyn_to_sql_vec();
 	let db = mm.db();
 
-	let id: Option<i64> = db.exec_returning_as_optional(&sql, &*values)?;
-
-	let id = id.map(Id::from);
+	let id: Option<Id> = db.exec_returning_as_optional(&sql, &*values)?;
 
 	if let Some(id) = id {
 		get_model_bus().publish(ModelEvent::new(
@@ -141,8 +138,7 @@ where
 	let values = fields.values_as_dyn_to_sql_vec();
 	let db = mm.db();
 
-	let id = db.exec_returning_num(&sql, &*values)?;
-	let id = Id::from(id);
+	let id: Id = db.exec_returning_as(&sql, &*values)?;
 
 	// -- Publish Model Event
 	get_model_bus().publish(ModelEvent::new(
@@ -178,53 +174,6 @@ where
 	Ok(entity)
 }
 
-pub fn get_by_uid<MC, E>(mm: &ModelManager, uid: Uuid) -> Result<E>
-where
-	MC: DbBmc,
-	E: SqliteFromRow + Unpin + Send,
-	E: HasSqliteFields,
-{
-	// -- Select
-	let sql = format!(
-		"SELECT {} FROM {} WHERE uid = ? LIMIT 1",
-		//
-		E::sqlite_columns_for_select(),
-		MC::table_ref(),
-	);
-
-	// -- Exec query
-	let db = mm.db();
-	let entity: E = db.fetch_first(&sql, [(&uid)])?.ok_or("Cannot get entity")?;
-
-	Ok(entity)
-}
-
-pub fn get_uid<MC>(mm: &ModelManager, id: Id) -> Result<Uuid>
-where
-	MC: DbBmc,
-{
-	let sql = format!("SELECT uid FROM {} WHERE id = ? LIMIT 1", MC::table_ref());
-
-	// -- Exec query
-	let db = mm.db();
-	let uid: Uuid = db.exec_returning_as(&sql, (id,))?;
-
-	Ok(uid)
-}
-
-pub fn get_id_for_uid<MC>(mm: &ModelManager, uid: Uuid) -> Result<Id>
-where
-	MC: DbBmc,
-{
-	let sql = format!("SELECT id FROM {} WHERE uid = ? LIMIT 1", MC::table_ref());
-
-	// -- Exec query
-	let db = mm.db();
-	let id: Id = db.exec_returning_as(&sql, (uid,))?;
-
-	Ok(id)
-}
-
 pub fn batch_create_with_rel_ids<MC>(
 	mm: &ModelManager,
 	mut items: Vec<SqliteFields>,
@@ -253,8 +202,8 @@ where
 			);
 
 			let values = fields.values_as_dyn_to_sql_vec();
-			let id = tx_db.exec_returning_num(&sql, &*values)?;
-			ids.push(id.into());
+			let id: Id = tx_db.exec_returning_as(&sql, &*values)?;
+			ids.push(id);
 		}
 		Ok(ids)
 	})?;

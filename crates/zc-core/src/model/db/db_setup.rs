@@ -22,8 +22,7 @@ const RUN_TABLE: (&str, &str) = (
 	"run",
 	"
 CREATE TABLE IF NOT EXISTS run (
-		id          INTEGER PRIMARY KEY AUTOINCREMENT,
-		uid         BLOB NOT NULL,
+		id          BLOB PRIMARY KEY,
 
 		prompt      TEXT,
 		answer      TEXT,
@@ -33,7 +32,7 @@ CREATE TABLE IF NOT EXISTS run (
 		mtime  INTEGER NOT NULL,
 
 		model       TEXT
-) STRICT",
+) STRICT, WITHOUT ROWID",
 );
 
 const ALL_MAIN_TABLES: &[(&str, &str)] = &[RUN_TABLE];
@@ -46,14 +45,6 @@ fn create_schema(con: &Connection) -> Result<()> {
 	for tables in [ALL_MAIN_TABLES] {
 		for (name, table_sql) in tables {
 			con.execute(table_sql, ())?;
-			con.execute(
-				&format!(
-					"
-		CREATE INDEX IF NOT EXISTS idx_{name}_uid ON {name}(uid);
-		"
-				),
-				(),
-			)?;
 		}
 	}
 
